@@ -47,7 +47,14 @@ class DbSimple_Mysqli extends DbSimple_Generic_Database
 		}
 
 		if (!$isIdent) {
-			return "'" . $this->link->real_escape_string($s) . "'";
+			try {
+				return "'" . $this->link->real_escape_string($s) . "'";
+			}
+			catch (ErrorException $e) {
+				$this->disconnect();
+				$this->_lazyConnect();
+				return "'" . $this->link->real_escape_string($s) . "'";
+			}
 		} else {
 			return "`" . str_replace('`', '``', $s) . "`";
 		}
